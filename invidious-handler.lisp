@@ -44,8 +44,8 @@
                                                                        (first
                                                                         (rest json))))))))))
           (cl-json:with-decoder-simple-list-semantics
-              (cl-json:decode-json-from-string
-               (dex:get "https://instances.invidio.us/instances.json?sort_by=health")))))
+            (cl-json:decode-json-from-string
+             (dex:get "https://instances.invidio.us/instances.json?sort_by=health")))))
 
 (defun invidious-instance-suggestion-filter ()
   (let* ((instances (get-invidious-instances)))
@@ -55,14 +55,14 @@
 (defvar *preferred-invidious-instance* nil)
 
 (defun invidious-handler (request-data)
- (let ((url (url request-data)))
+  (let ((url (url request-data)))
     (setf (url request-data)
           (if (or (search "youtube.com" (quri:uri-host url))
-		  (search "youtu.be"    (quri:uri-host url)))
+                  (search "youtu.be"    (quri:uri-host url)))
               (progn
                 (setf (quri:uri-host url)
-		      (or *preferred-invidious-instance*
-			  (object-string (first (get-invidious-instances)))))
+                      (or *preferred-invidious-instance*
+                          (object-string (first (get-invidious-instances)))))
                 (log:info "Switching to Invidious: ~s" (render-url url))
                 url)
               url)))

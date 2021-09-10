@@ -26,7 +26,7 @@
           (if (search "reddit.com" (quri:uri-host url))
               (progn
                 (setf (quri:uri-host url) (or *preferred-teddit-instance*
-					      "teddit.net"))
+                                              "teddit.net"))
                 (log:info "Switching to Teddit: ~s" (render-url url))
                 url)
               url)))
@@ -39,6 +39,6 @@
   (let ((instance (prompt-minibuffer
                    :input-prompt "Input the URL of the instance"
                    :suggestion-function (history-suggestion-filter
-                                      :prefix-urls (list (object-string
-                                                          (url (current-buffer))))))))
+                                         :prefix-urls (list (object-string
+                                                             (url (current-buffer))))))))
     (setf nx-freestance-handler:*preferred-teddit-instance* instance)))

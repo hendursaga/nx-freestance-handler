@@ -20,14 +20,15 @@
 (in-package :nyxt)
 
 (uiop:define-package :nx-freestance-handler
-    (:use :common-lisp :nyxt)
+  (:use :common-lisp :nyxt)
   (:documentation "A redirector from mainstream websites to their privacy-supporting mirrors for the Nyxt browser.")
-  (:export :*preferred-invidious-instance*
-           :*preferred-teddit-instance*
-           :*preferred-bibliogram-instance*
-           :*preferred-nitter-instance*
-           :*freestance-handlers*
-           :invidious-handler
-           :teddit-handler
-           :bibliogram-handler
-           :nitter-handler))
+  (:export
+   :*preferred-invidious-instance*
+   :*preferred-teddit-instance*
+   :*preferred-bibliogram-instance*
+   :*preferred-nitter-instance*
+   :*freestance-handlers*
+   :invidious-handler
+   :teddit-handler
+   :bibliogram-handler
+   :nitter-handler))

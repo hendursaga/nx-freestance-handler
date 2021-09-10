@@ -26,7 +26,7 @@
           (if (search "twitter.com" (quri:uri-host url))
               (progn
                 (setf (quri:uri-host url) (or *preferred-nitter-instance*
-					      "nitter.net"))
+                                              "nitter.net"))
                 (log:info "Switching to Nitter: ~s" (render-url url))
                 url)
               url)))
@@ -39,6 +39,6 @@
   (let ((instance (prompt-minibuffer
                    :input-prompt "Input the URL of the instance"
                    :suggestion-function (history-suggestion-filter
-                                      :prefix-urls (list (object-string
-                                                          (url (current-buffer))))))))
+                                         :prefix-urls (list (object-string
+                                                             (url (current-buffer))))))))
     (setf nx-freestance-handler:*preferred-nitter-instance* instance)))

@@ -18,7 +18,6 @@
 ;;;; nx-freestance-handler.asd
 
 (asdf:defsystem :nx-freestance-handler
-  :serial t
   :version "1.0.0"
   :description "A redirector from mainstream websites to their privacy-supporting mirrors for the Nyxt browser."
   :author "kssytsrk"

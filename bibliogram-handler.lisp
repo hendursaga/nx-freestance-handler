@@ -26,11 +26,11 @@
           (if (search "instagram.com" (quri:uri-host url))
               (progn
                 (setf (quri:uri-host url) (or *preferred-bibliogram-instance*
-					      "bibliogram.art"))
-		(if (and (< 0 (length (quri:uri-path url)))
-			 (not (str:starts-with? "/p/" (quri:uri-path url))))
-		    (setf (quri:uri-path url)
-			  (concatenate 'string "/u" (quri:uri-path url))))
+                                              "bibliogram.art"))
+                (if (and (< 0 (length (quri:uri-path url)))
+                         (not (str:starts-with? "/p/" (quri:uri-path url))))
+                    (setf (quri:uri-path url)
+                          (concatenate 'string "/u" (quri:uri-path url))))
                 (log:info "Switching to Bibliogram: ~s" (render-url url))
                 url)
               url)))
@@ -43,6 +43,6 @@
   (let ((instance (prompt-minibuffer
                    :input-prompt "Input the URL of the instance"
                    :suggestion-function (history-suggestion-filter
-                                      :prefix-urls (list (object-string
-                                                          (url (current-buffer))))))))
+                                         :prefix-urls (list (object-string
+                                                             (url (current-buffer))))))))
     (setf nx-freestance-handler:*preferred-bibliogram-instance* instance)))
