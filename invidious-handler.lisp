@@ -1,6 +1,7 @@
 ;;;; freestance-handler, a redirector from mainstream websites to their
 ;;;; privacy-supporting mirrors for the Nyxt browser
 ;;;; Copyright (C) 2020 kssytsrk
+;;;; Copyright (C) 2021 Hendursaga
 
 ;;;; This program is free software: you can redistribute it and/or modify
 ;;;; it under the terms of the GNU General Public License as published by
@@ -35,17 +36,13 @@
 (defun get-invidious-instances ()
   (mapcar #'(lambda (json)
               (make-invidious-instance :name (first json)
-                                       :health (rest
-                                                (assoc ':ratio
-                                                       (rest
-                                                        (assoc ':weekly-ratio
-                                                               (rest
-                                                                (assoc ':monitor
-                                                                       (first
-                                                                        (rest json))))))))))
+                                       :health (~>> (rest json) first
+                                                  (assoc ':monitor) rest
+                                                  (assoc ':90-d-ratio) rest
+                                                  (assoc ':ratio) rest)))
           (cl-json:with-decoder-simple-list-semantics
             (cl-json:decode-json-from-string
-             (dex:get "https://instances.invidio.us/instances.json?sort_by=health")))))
+             (dex:get "https://api.invidious.io/instances.json?sort_by=health")))))
 
 (defun invidious-instance-suggestion-filter ()
   (let* ((instances (get-invidious-instances)))

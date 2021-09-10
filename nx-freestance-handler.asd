@@ -23,7 +23,7 @@
   :author "kssytsrk"
   :license "GNU General Public License v3.0"
   :serial t
-  :depends-on ()
+  :depends-on (serapeum)
   :components ((:file "package")
                (:file "invidious-handler")
                (:file "teddit-handler")

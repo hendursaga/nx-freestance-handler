@@ -22,6 +22,8 @@
 (uiop:define-package :nx-freestance-handler
   (:use :common-lisp :nyxt)
   (:documentation "A redirector from mainstream websites to their privacy-supporting mirrors for the Nyxt browser.")
+  (:import-from #:serapeum
+                #:~>>)
   (:export
    :*preferred-invidious-instance*
    :*preferred-teddit-instance*
