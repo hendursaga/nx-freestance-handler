@@ -20,34 +20,35 @@
 
 (in-package :nx-freestance-handler)
 
-(defstruct invidious-instance
-  (name)
-  (health))
+(define-class invidious-instance ()
+  ((url (error "Slot `url' must be set")
+         :type quri:uri
+         :documentation "The URL of the instance.")
+   (health nil
+           :type (or null float)
+           :documentation "The instance uptime as a percentage."))
+  (:export-class-name-p t)
+  (:export-accessor-names-p t)
+  (:accessor-name-transformer (class*:make-name-transformer name)))
 
-(defmethod object-string ((invidious-instance invidious-instance))
-  (invidious-instance-name invidious-instance))
-
-(defmethod object-display ((invidious-instance invidious-instance))
-  (format nil
-          "~a (health: ~:[unknown~;~:*~a~])"
-          (invidious-instance-name invidious-instance)
-          (invidious-instance-health invidious-instance)))
+(defmethod prompter:object-attributes ((instance invidious-instance))
+  `(("URL" ,(render-url (url instance)))
+    ("Health" ,(format nil "~:[N/A~;~:*~,2f%~]" (health instance)))))
 
 (defun get-invidious-instances ()
   (mapcar #'(lambda (json)
-              (make-invidious-instance :name (first json)
-                                       :health (~>> (rest json) first
-                                                  (assoc ':monitor) rest
-                                                  (assoc ':90-d-ratio) rest
-                                                  (assoc ':ratio) rest)))
+              (let ((json (first (rest json))))
+                (make-instance 'invidious-instance
+                               :url (~>> json
+                                         (assoc ':uri) rest
+                                         nyxt:url)
+                               :health (~>> json
+                                            (assoc ':monitor) rest
+                                            (assoc ':90-d-ratio) rest
+                                            (assoc ':ratio) rest))))
           (cl-json:with-decoder-simple-list-semantics
             (cl-json:decode-json-from-string
              (dex:get "https://api.invidious.io/instances.json?sort_by=health")))))
-
-(defun invidious-instance-suggestion-filter ()
-  (let* ((instances (get-invidious-instances)))
-    (lambda (minibuffer)
-      (fuzzy-match (input-buffer minibuffer) instances))))
 
 (defvar *preferred-invidious-instance* nil)
 
@@ -56,10 +57,10 @@
     (setf (url request-data)
           (if (or (search "youtube.com" (quri:uri-host url))
                   (search "youtu.be"    (quri:uri-host url)))
-              (progn
-                (setf (quri:uri-host url)
-                      (or *preferred-invidious-instance*
-                          (object-string (first (get-invidious-instances)))))
+              (let ((instance (or *preferred-invidious-instance*
+                                  (url (first (get-invidious-instances))))))
+                (setf (quri:uri-host url) (quri:uri-host instance)
+                      (quri:uri-scheme url) (quri:uri-scheme instance))
                 (log:info "Switching to Invidious: ~s" (render-url url))
                 url)
               url)))
@@ -67,9 +68,13 @@
 
 (in-package :nyxt)
 
+(define-class instance-source (prompter:source)
+  ((prompter:name "URL")
+   (prompter:constructor (nx-freestance-handler::get-invidious-instances))))
+
 (define-command set-preferred-invidious-instance ()
-  "Set the preferred invidious instance."
-  (let ((instance (prompt-minibuffer
-                   :input-prompt "Choose an instance"
-                   :suggestion-function (nx-freestance-handler::invidious-instance-suggestion-filter))))
-    (setf nx-freestance-handler:*preferred-invidious-instance* (nx-freestance-handler::object-string instance))))
+  "Set the preferred Invidious instance."
+  (let ((instance (first (prompt
+                          :prompt "Instance"
+                          :sources (make-instance 'instance-source)))))
+    (setf nx-freestance-handler:*preferred-invidious-instance* (url instance))))
