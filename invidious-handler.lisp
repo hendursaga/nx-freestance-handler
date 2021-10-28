@@ -20,25 +20,10 @@
 
 (in-package :nx-freestance-handler)
 
-(define-class invidious-instance ()
-  ((url (error "Slot `url' must be set")
-         :type quri:uri
-         :documentation "The URL of the instance.")
-   (health nil
-           :type (or null float)
-           :documentation "The instance uptime as a percentage."))
-  (:export-class-name-p t)
-  (:export-accessor-names-p t)
-  (:accessor-name-transformer (class*:make-name-transformer name)))
-
-(defmethod prompter:object-attributes ((instance invidious-instance))
-  `(("URL" ,(render-url (url instance)))
-    ("Health" ,(format nil "~:[N/A~;~:*~,2f%~]" (health instance)))))
-
 (defun get-invidious-instances ()
   (mapcar #'(lambda (json)
               (let ((json (first (rest json))))
-                (make-instance 'invidious-instance
+                (make-instance 'freestance-instance
                                :url (~>> json
                                          (assoc ':uri) rest
                                          nyxt:url)
