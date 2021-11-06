@@ -59,7 +59,7 @@
 
 (define-command set-preferred-invidious-instance ()
   "Set the preferred Invidious instance."
-  (let ((instance (first (prompt
-                          :prompt "Instance"
-                          :sources (make-instance 'instance-source)))))
+  (let ((instance (prompt1
+                    :prompt "Instance"
+                    :sources (make-instance 'instance-source))))
     (setf nx-freestance-handler:*preferred-invidious-instance* (url instance))))
