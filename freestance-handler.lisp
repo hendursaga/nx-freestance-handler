@@ -1,6 +1,7 @@
 ;;;; freestance-handler, a redirector from mainstream websites to their
 ;;;; privacy-supporting mirrors for the Nyxt browser
 ;;;; Copyright (C) 2020 kssytsrk
+;;;; Copyright (C) 2021 Hendursaga
 
 ;;;; This program is free software: you can redistribute it and/or modify
 ;;;; it under the terms of the GNU General Public License as published by
@@ -22,3 +23,18 @@
 (defparameter *freestance-handlers*
   (list #'invidious-handler #'teddit-handler #'bibliogram-handler #'nitter-handler)
   "List of all handlers in the nx-freestance-handler.")
+
+(define-class freestance-instance ()
+  ((url (error "Slot `url' must be set")
+         :type quri:uri
+         :documentation "The URL of the instance.")
+   (health nil
+           :type (or null float)
+           :documentation "The instance uptime as a percentage, between 0 and 100."))
+  (:export-class-name-p t)
+  (:export-accessor-names-p t)
+  (:accessor-name-transformer (class*:make-name-transformer name)))
+
+(defmethod prompter:object-attributes ((instance freestance-instance))
+  `(("URL" ,(render-url (url instance)))
+    ("Health" ,(format nil "~:[N/A~;~:*~,2f%~]" (health instance)))))
